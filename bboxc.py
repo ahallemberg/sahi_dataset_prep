@@ -18,23 +18,33 @@ def get_bbox_area(directory):
             for line in lines:
                 cls, x, y, w, h = map(float, line.strip().split())
                 cls = int(cls)
-                #print(f"Class: {cls}, x: {x}, y: {y}, w: {w}, h: {h}")
-                #print(f"Bounding box area: {w*h}")
                 _dict[cls].append(w*h)
+
+    n_bbox_cls_0 = len(_dict[0])
+    n_bbox_cls_1 = len(_dict[1])
+    n_bbox_cls = n_bbox_cls_0 + n_bbox_cls_1                
+
+    avg_bbox_area_cls_0 = round(sum(_dict[0])/len(_dict[0])*100,2)
+    avg_bbox_area_cls_1 = round(sum(_dict[1])/len(_dict[1])*100,2)
+
+    total_area_cls_0 = round(sum(_dict[0])/len(os.listdir(directory))*100,2)
+    total_area_cls_1 = round(sum(_dict[1])/len(os.listdir(directory))*100,2)
+    total_area_cls = round(total_area_cls_0 + total_area_cls_1,2)
+
     print("-"*20)
-    print(f"Number of bounding boxes of class 0: {len(_dict[0])}")
-    print(f"Number of bounding boxes of class 1: {len(_dict[1])}")
-    print(f"Total number of bounding boxes: {len(_dict[0]) + len(_dict[1])}")
+    print(f"Number of bounding boxes of class 0: {n_bbox_cls_0}")
+    print(f"Number of bounding boxes of class 1: {n_bbox_cls_1}")
+    print(f"Total number of bounding boxes: {n_bbox_cls}")
     print("-"*20)
-    print(f"Average bbox area of class 0: {sum(_dict[0])/len(_dict[0])}%")
-    print(f"Average bbox area of class 1: {sum(_dict[1])/len(_dict[1])}%")
+    print(f"Average bbox area of class 0: {avg_bbox_area_cls_0}%")
+    print(f"Average bbox area of class 1: {avg_bbox_area_cls_1}%")
     print("-"*20)
-    print(f"{sum(_dict[0])/len(os.listdir(directory))}% of total area covered by class 0")
-    print(f"{sum(_dict[1])/len(os.listdir(directory))}% of total area covered by class 1")
-    print(f"{(sum(_dict[0]) + sum(_dict[1])) / len(os.listdir(directory))}% total area covered by both classes")
+    print(f"Total area covered by class 0: {total_area_cls_0}%")
+    print(f"Total area covered by class 1: {total_area_cls_1}%")
+    print(f"Total area covered by both classes: {total_area_cls}%")
     print("-"*20)
 
-target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/labels"
+target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/resized/labels"
 
 get_bbox_area(target_dir)
 print(f"Number of non-empty files: {count_non_empty_files(target_dir)} of {file_count(target_dir)} files")

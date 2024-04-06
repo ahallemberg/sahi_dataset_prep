@@ -18,17 +18,23 @@ def get_bbox_area(directory):
             for line in lines:
                 cls, x, y, w, h = map(float, line.strip().split())
                 cls = int(cls)
-                print(f"Class: {cls}, x: {x}, y: {y}, w: {w}, h: {h}")
-                print(f"Bounding box area: {w*h}")
+                #print(f"Class: {cls}, x: {x}, y: {y}, w: {w}, h: {h}")
+                #print(f"Bounding box area: {w*h}")
                 _dict[cls].append(w*h)
+    print("-"*20)
+    print(f"Number of bounding boxes of class 0: {len(_dict[0])}")
+    print(f"Number of bounding boxes of class 1: {len(_dict[1])}")
+    print(f"Total number of bounding boxes: {len(_dict[0]) + len(_dict[1])}")
+    print("-"*20)
+    print(f"Average bbox area of class 0: {sum(_dict[0])/len(_dict[0])}%")
+    print(f"Average bbox area of class 1: {sum(_dict[1])/len(_dict[1])}%")
+    print("-"*20)
+    print(f"{sum(_dict[0])/len(os.listdir(directory))}% of total area covered by class 0")
+    print(f"{sum(_dict[1])/len(os.listdir(directory))}% of total area covered by class 1")
+    print(f"{(sum(_dict[0]) + sum(_dict[1])) / len(os.listdir(directory))}% total area covered by both classes")
+    print("-"*20)
 
-    area_0 = sum(_dict[0])/len(_dict[0]) * 100
-    area_1 = sum(_dict[1])/len(_dict[1]) * 100
-    print(f"{area_0:.2f}% of area covered by class 0")
-    print(f"{area_1:.2f}% of area covered by class 1")
-    print(f"{area_0 + area_1:.2f}% of area covered by bboxes")
+target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/sliced/labels"
 
-target_dir = os.path.abspath(os.path.join(os.path.dirname(__name__), "test", "sliced", "labels"))
-
-print(f"Number of non-empty files: {count_non_empty_files(target_dir)} of {file_count(target_dir)} files")
 get_bbox_area(target_dir)
+print(f"Number of non-empty files: {count_non_empty_files(target_dir)} of {file_count(target_dir)} files")

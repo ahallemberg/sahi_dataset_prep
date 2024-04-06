@@ -34,7 +34,7 @@ def get_bbox_area(directory):
     print(f"{(sum(_dict[0]) + sum(_dict[1])) / len(os.listdir(directory))}% total area covered by both classes")
     print("-"*20)
 
-target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/sliced/labels"
+target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/labels"
 
 get_bbox_area(target_dir)
 print(f"Number of non-empty files: {count_non_empty_files(target_dir)} of {file_count(target_dir)} files")

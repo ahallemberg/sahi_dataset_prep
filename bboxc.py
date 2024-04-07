@@ -1,6 +1,10 @@
 import os
+from random import shuffle
 
-def count_non_empty_files(directory):
+def empty_files_count(directory):
+    return sum(os.path.getsize(os.path.join(directory, file)) == 0 for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file)))
+
+def non_empty_files_count(directory):
     return sum(os.path.getsize(os.path.join(directory, file)) > 0 for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file)))
 
 def file_count(directory):
@@ -44,7 +48,31 @@ def get_bbox_area(directory):
     print(f"Total area covered by both classes: {total_area_cls}%")
     print("-"*20)
 
-target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/resized/labels"
+
+def delete_for_target_empty_ratio(directory, target_empty_ratio):
+    files = os.listdir(directory)
+    shuffle(files)
+    for file in files:
+        with open(os.path.join(directory, file), "r") as f:
+            lines = f.readlines()
+            if empty_files_count(directory)/file_count(directory) <= target_empty_ratio:
+                break  
+
+            if len(lines) == 0:
+                os.remove(os.path.join(directory, file))
+                img_path = os.path.join(directory, "..", "images", file.replace("txt", "png"))
+                os.remove(img_path)
+           
+
+
+target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/sliced/labels"
 
 get_bbox_area(target_dir)
-print(f"Number of non-empty files: {count_non_empty_files(target_dir)} of {file_count(target_dir)} files")
+print(f"Number of non-empty files: {non_empty_files_count(target_dir)} of {file_count(target_dir)} files")
+
+delete_for_target_empty_ratio(target_dir, 0.5)
+
+get_bbox_area(target_dir)
+print(f"Number of non-empty files: {non_empty_files_count(target_dir)} of {file_count(target_dir)} files")
+
+print(f"Empty files ratio: {empty_files_count(target_dir)/file_count(target_dir):.2f}")

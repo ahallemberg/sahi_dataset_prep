@@ -3,8 +3,8 @@ from yolotococo import YoloToCoco
 from cocotoyolo import CocoToYolo
 from slicer import Slicer 
 
-rel_input_dir="test/resized"
-rel_output_dir="test/sliced"
+input_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/resized"
+output_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/sliced"
 categories=[{"id": 0, "name": "emergent"}, {"id": 1, "name": "standard"}]
 
 slice_height = 1273
@@ -12,8 +12,8 @@ slice_width = 1273
 overlap_ratio = 0.1358354805775648
 
 def main(
-        rel_input_dir: str, 
-        rel_output_dir:str, 
+        input_dir: str, 
+        output_dir:str, 
         categories: list[dict[str, str|int]], 
         slice_height: int, 
         slice_width: int, 
@@ -22,8 +22,6 @@ def main(
     ) -> None:
  
     output_file_name = ".temp.annotations.json"
-    input_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), rel_input_dir))
-    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), rel_output_dir))
 
     print("Converting YOLO labels to COCO")
     yolo_to_coco = YoloToCoco(
@@ -78,4 +76,4 @@ def main(
 
 
 if __name__ == "__main__": 
-    main(rel_input_dir, rel_output_dir, categories, slice_height, slice_width, overlap_ratio, overlap_ratio)
+    main(input_dir, output_dir, categories, slice_height, slice_width, overlap_ratio, overlap_ratio)

@@ -1,5 +1,8 @@
 import os
 from random import shuffle
+import concurrent.futures
+from tqdm import tqdm
+
 
 def empty_files_count(directory):
     return sum(os.path.getsize(os.path.join(directory, file)) == 0 for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file)))
@@ -49,28 +52,49 @@ def get_bbox_area(directory):
     print("-"*20)
 
 
-def delete_for_target_empty_ratio(directory, target_empty_ratio):
-    files = os.listdir(directory)
-    shuffle(files)
-    for file in files:
-        with open(os.path.join(directory, file), "r") as f:
-            lines = f.readlines()
-            if empty_files_count(directory)/file_count(directory) <= target_empty_ratio:
-                break  
+class DeleteEmptyFiles:
+    def __init__(self, directory: str, target_empty_ratio: float):
+        self.directory = directory
+        self.target_empty_ratio = target_empty_ratio
 
-            if len(lines) == 0:
-                os.remove(os.path.join(directory, file))
-                img_path = os.path.join(directory, "..", "images", file.replace("txt", "png"))
-                os.remove(img_path)
-           
+    def _delete_file(self, file: str):
+        os.remove(os.path.join(self.directory, file))
+        img_path = os.path.join(self.directory, "..", "images", file.replace("txt", "png"))
+        os.remove(img_path)
+        
 
+
+    def delete_for_target_empty_ratio(self):
+
+        while True:
+            files = os.listdir(self.directory)
+            files_to_delete = []
+
+            for file in files:
+                with open(os.path.join(self.directory, file), "r") as f:
+                    lines = f.readlines()
+                    if len(lines) == 0:
+                        files_to_delete.append(file)
+                        continue
+            
+            n = round(empty_files_count(self.directory) - file_count(self.directory)*self.target_empty_ratio)
+            print(n)
+            if n < 1: 
+                break 
+
+            shuffle(files_to_delete)
+            files_to_delete = files_to_delete[:n]
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                for _ in executor.map(self._delete_file, files_to_delete):
+                        ...
 
 target_dir = "/home/askhb/ascend/suas2023_detection_dataset/test/sliced/labels"
 
 get_bbox_area(target_dir)
 print(f"Number of non-empty files: {non_empty_files_count(target_dir)} of {file_count(target_dir)} files")
 
-delete_for_target_empty_ratio(target_dir, 0.5)
+delete_empty_files = DeleteEmptyFiles(target_dir, 0.1)
+delete_empty_files.delete_for_target_empty_ratio()
 
 get_bbox_area(target_dir)
 print(f"Number of non-empty files: {non_empty_files_count(target_dir)} of {file_count(target_dir)} files")
